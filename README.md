@@ -2,8 +2,8 @@
 
 Backend RESTful API sederhana untuk mengelola data user. Memiliki fitur CRUD, Validasi dan Integrasi dengan database MongoDB.
 
-Tampilan Website
-![Screenshot Tampilan Web](public/screenshot.png)
+#### Tampilan Website
+![Screenshot Tampilan Web](public/img/website.png)
 
 ---
 
@@ -47,7 +47,7 @@ user-manager-api/
 1. Pastikan Node.js dan MongoDB sudah terinstal di sistem Anda.
 2. Clone repository ini:
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/Jianyao17/user-manager-api.git
    ```
 3. Masuk ke direktori proyek:
    ```bash
