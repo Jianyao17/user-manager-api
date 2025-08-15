@@ -38,5 +38,11 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, async () => 
 { 
   await connectDB(); // Koneksi ke MongoDB
-  console.log(`Server running on http://localhost:${PORT}`) 
+
+  if (process.env.NODE_ENV === 'production') 
+  {
+    console.log(`Server running in production mode on port ${PORT}`);
+  } else {
+    console.log(`Server running in development mode at http://localhost:${PORT}`);
+  }
 });
