@@ -44,7 +44,7 @@ user-manager-api/
 ## Cara Menjalankan Aplikasi
 
 ### Secara Umum
-1. Pastikan Node.js dan MongoDB sudah terinstal di sistem Anda.
+1. Pastikan Node.js sudah terinstal di sistem Anda.
 2. Clone repository ini:
    ```bash
    git clone https://github.com/Jianyao17/user-manager-api.git
@@ -57,11 +57,23 @@ user-manager-api/
    ```bash
    npm install
    ```
-5. Jalankan server:
+5. Setup MongoDB:
+   - Buat file `.env` di root proyek.
+   - Tambahkan URI MongoDB ke dalam file `.env`. Contoh:
+     ```env
+     PORT=3000
+     MONGODB_URI=mongodb://localhost:27017/user_manager
+     ```
+     Untuk MongoDB cloud, gunakan URI yang disediakan oleh layanan cloud Anda, misalnya:
+     ```env
+     PORT=3000
+     MONGODB_URI=mongodb+srv://username:password@cluster0.mongodb.net/user_manager?retryWrites=true&w=majority
+     ```
+6. Jalankan server:
    ```bash
    npm start
    ```
-6. Akses aplikasi di `http://localhost:3000`.
+7. Akses aplikasi di `http://localhost:3000`.
 
 ### Menggunakan Docker
 1. Pastikan Docker sudah terinstal di sistem Anda.
