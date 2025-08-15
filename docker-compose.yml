@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  # Layanan untuk aplikasi Node.js 
+  api:
+    build: . # Build dari Dockerfile di direktori root
+    ports:
+      - "3000:3000" # Map port 3000 di host ke port 3000 di container
+    environment:
+      - PORT=3000
+      - MONGO_URI=mongodb://mongo:27017/user_management_db
+    volumes:
+      - .:/app
+      - /app/node_modules
+    depends_on:
+      - mongo 
+    networks:
+      - app-network
+
+  # Layanan untuk database MongoDB
+  mongo:
+    image: mongo:latest 
+    ports:
+      # Optional: Buka port agar bisa diakses dari luar container 
+      - "27017:27017"
+    volumes:
+      # Simpan data database secara persisten di volume bernama 'mongo-data'
+      - mongo-data:/data/db
+    networks:
+      - app-network
+
+# Definisikan network untuk komunikasi antar service
+networks:
+  app-network:
+    driver: bridge
+
+# Definisikan volume untuk persistensi data
+volumes:
+  mongo-data:

@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manajemen Pengguna</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 font-sans">
+
+    <div id="notification-container" class="fixed top-5 right-5 z-50 space-y-2"></div>
+
+    <div class="container max-w-5xl mx-auto p-4 md:p-8">
+        <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">Manajemen Pengguna</h1>
+
+        <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+            <h3 id="form-title" class="text-xl font-semibold mb-4 text-gray-700">Tambah Pengguna Baru</h3>
+            <form id="user-form" class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2">
+                <input type="hidden" id="user-id">
+
+                <div>
+                    <label for="nama" class="block text-sm font-medium text-gray-600 mb-1">Nama</label>
+                    <input type="text" id="nama" placeholder="John Doe"
+                        class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none transition">
+                    <p id="nama-error" class="text-red-600 text-xs mt-1 min-h-[1rem]"></p>
+                </div>
+
+                <div>
+                    <label for="email" class="block text-sm font-medium text-gray-600 mb-1">Email</label>
+                    <input type="email" id="email" placeholder="john.doe@example.com"
+                        class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none transition">
+                    <p id="email-error" class="text-red-600 text-xs mt-1 min-h-[1rem]"></p>
+                </div>
+
+                <div>
+                    <label for="nomorTelepon" class="block text-sm font-medium text-gray-600 mb-1">Nomor Telepon</label>
+                    <input type="text" id="nomorTelepon" placeholder="Minimal 10 digit angka"
+                        class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none transition">
+                    <p id="nomorTelepon-error" class="text-red-600 text-xs mt-1 min-h-[1rem]"></p>
+                </div>
+
+                <div>
+                    <label for="departemen" class="block text-sm font-medium text-gray-600 mb-1">Departemen</label>
+                    <input type="text" id="departemen" placeholder="Teknologi"
+                        class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none transition">
+                    <p id="departemen-error" class="text-red-600 text-xs mt-1 min-h-[1rem]"></p>
+                </div>
+
+                <div class="md:col-span-2 flex flex-col sm:flex-row sm:items-center sm:justify-between mt-4">
+                    <label class="flex items-center space-x-2 text-gray-600 mb-4 sm:mb-0">
+                        <input type="checkbox" id="statusAktif" checked
+                            class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                        <span>Status Aktif</span>
+                    </label>
+
+                    <div class="flex items-center space-x-2">
+                        <button type="submit" id="submit-button"
+                            class="px-5 py-2 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200">Simpan</button>
+                        <button type="button" id="cancel-button" style="display: none;"
+                            class="px-5 py-2 bg-gray-500 text-white font-semibold rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400 transition-colors duration-200">Batal</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-md overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="min-w-full bg-white">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="p-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Nama
+                            </th>
+                            <th class="p-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Email
+                            </th>
+                            <th class="p-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">No.
+                                Telepon</th>
+                            <th class="p-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                                Departemen</th>
+                            <th class="p-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                                Status</th>
+                            <th class="p-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Aksi
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody id="user-table-body" class="divide-y divide-gray-200">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = '/api/v1/users';
+
+        const userForm = document.getElementById('user-form');
+        const formTitle = document.getElementById('form-title');
+        const submitButton = document.getElementById('submit-button');
+        const cancelButton = document.getElementById('cancel-button');
+        const userTableBody = document.getElementById('user-table-body');
+        const userIdInput = document.getElementById('user-id');
+
+        const showNotification = (message, type = 'success') => {
+            const container = document.getElementById('notification-container');
+            const notification = document.createElement('div');
+            const baseClasses = 'px-4 py-2 rounded-md shadow-lg text-white font-semibold transform transition-all duration-300';
+            const typeClasses = type === 'success' ? 'bg-green-500' : 'bg-red-600';
+
+            notification.className = `${baseClasses} ${typeClasses} opacity-0 translate-y-2`;
+            notification.textContent = message;
+            container.appendChild(notification);
+
+            setTimeout(() => {
+                notification.classList.remove('opacity-0', 'translate-y-2');
+            }, 10);
+
+            setTimeout(() => {
+                notification.classList.add('opacity-0', '-translate-y-2');
+                notification.addEventListener('transitionend', () => notification.remove());
+            }, 3000);
+        };
+
+        const clearValidationErrors = () => {
+            document.querySelectorAll('[id$="-error"]').forEach(el => el.textContent = '');
+        };
+
+        const displayError = (errorData) => {
+            clearValidationErrors();
+            if (errorData.errors && Array.isArray(errorData.errors)) {
+                errorData.errors.forEach(err => {
+                    const errorElement = document.getElementById(`${err.field}-error`);
+                    if (errorElement) {
+                        errorElement.textContent = err.message;
+                    }
+                });
+                showNotification(errorData.message || 'Harap perbaiki isian form Anda.', 'error');
+            } else {
+                showNotification(errorData.message || 'Terjadi kesalahan.', 'error');
+            }
+        };
+
+        const clearForm = () => {
+            userForm.reset();
+            userIdInput.value = '';
+            formTitle.textContent = 'Tambah Pengguna Baru';
+            submitButton.textContent = 'Simpan';
+            cancelButton.style.display = 'none';
+            document.getElementById('statusAktif').checked = true;
+            clearValidationErrors();
+        };
+
+        const fetchUsers = async () => {
+            try {
+                const response = await fetch(API_URL);
+                const jsonResponse = await response.json();
+                if (!response.ok) throw jsonResponse;
+
+                const users = jsonResponse.data;
+
+                userTableBody.innerHTML = '';
+                if (!users || users.length === 0) {
+                    userTableBody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-gray-500">Belum ada data pengguna.</td></tr>`;
+                } else {
+                    users.forEach(user => {
+                        const row = document.createElement('tr');
+                        row.className = 'hover:bg-gray-50';
+                        row.innerHTML = `
+                            <td class="p-4 whitespace-nowrap text-sm font-medium text-gray-900">${user.nama}</td>
+                            <td class="p-4 whitespace-nowrap text-sm text-gray-500">${user.email}</td>
+                            <td class="p-4 whitespace-nowrap text-sm text-gray-500">${user.nomorTelepon}</td>
+                            <td class="p-4 whitespace-nowrap text-sm text-gray-500">${user.departemen}</td>
+                            <td class="p-4 whitespace-nowrap text-sm text-gray-500">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${user.statusAktif ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+                                    ${user.statusAktif ? 'Aktif' : 'Nonaktif'}
+                                </span>
+                            </td>
+                            <td class="p-4 whitespace-nowrap text-sm font-medium space-x-2">
+                                <button onclick='editUser(${JSON.stringify(user)})' class="text-blue-600 hover:text-blue-900">Edit</button>
+                                <button onclick="deleteUser('${user._id}')" class="text-red-600 hover:text-red-900">Hapus</button>
+                            </td>
+                        `;
+                        userTableBody.appendChild(row);
+                    });
+                }
+            } catch (error) {
+                showNotification(error.message || 'Gagal mengambil data pengguna.', 'error');
+            }
+        };
+
+        const editUser = (user) => {
+            userIdInput.value = user._id;
+            document.getElementById('nama').value = user.nama;
+            document.getElementById('email').value = user.email;
+            document.getElementById('nomorTelepon').value = user.nomorTelepon;
+            document.getElementById('departemen').value = user.departemen;
+            document.getElementById('statusAktif').checked = user.statusAktif;
+            formTitle.textContent = 'Edit Pengguna';
+            submitButton.textContent = 'Update';
+            cancelButton.style.display = 'inline-block';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            clearValidationErrors();
+        };
+
+        const deleteUser = async (id) => {
+            if (confirm('Apakah Anda yakin ingin menghapus pengguna ini?')) {
+                try {
+                    const response = await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+                    const data = await response.json();
+                    if (!response.ok) throw data;
+                    showNotification(data.message, 'success');
+                    fetchUsers();
+                } catch (error) {
+                    displayError(error);
+                }
+            }
+        };
+
+        userForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            clearValidationErrors();
+
+            const id = userIdInput.value;
+            const userData = {
+                nama: document.getElementById('nama').value,
+                email: document.getElementById('email').value,
+                nomorTelepon: document.getElementById('nomorTelepon').value,
+                departemen: document.getElementById('departemen').value,
+                statusAktif: document.getElementById('statusAktif').checked,
+            };
+
+            const method = id ? 'PUT' : 'POST';
+            const url = id ? `${API_URL}/${id}` : API_URL;
+
+            try {
+                const response = await fetch(url, {
+                    method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(userData),
+                });
+                const data = await response.json();
+                if (!response.ok) throw data;
+
+                showNotification(data.message, 'success');
+                clearForm();
+                fetchUsers();
+            } catch (error) {
+                displayError(error);
+            }
+        });
+
+        cancelButton.addEventListener('click', clearForm);
+
+        document.addEventListener('DOMContentLoaded', fetchUsers);
+    </script>
+</body>
+
+</html>

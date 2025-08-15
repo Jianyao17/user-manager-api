@@ -1,0 +1,13 @@
+# Jangan salin dependensi dari host
+node_modules
+
+# Jangan salin file environment
+.env
+.env.example
+
+# Jangan salin log
+npm-debug.log
+
+# Jangan salin folder Git
+.git
+.gitignore
