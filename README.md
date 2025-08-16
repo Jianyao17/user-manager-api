@@ -77,11 +77,19 @@ user-manager-api/
 
 ### Menggunakan Docker
 1. Pastikan Docker sudah terinstal di sistem Anda.
-2. Jalankan perintah berikut untuk membangun dan menjalankan container:
+2. Clone repository ini:
+   ```bash
+   git clone https://github.com/Jianyao17/user-manager-api.git
+   ```
+3. Masuk ke direktori proyek:
+   ```bash
+   cd user-manager-api
+   ```
+3. Jalankan perintah berikut untuk membangun dan menjalankan container:
    ```bash
    docker-compose up --build
    ```
-3. Akses aplikasi di `http://localhost:3000`.
+4. Akses aplikasi di `http://localhost:3000`.
 
 ---
 
